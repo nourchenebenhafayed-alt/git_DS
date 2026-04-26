@@ -1,0 +1,49 @@
+@startuml AGL_Pro_System
+' Définition des classes pour le système e-commerce
+class Utilisateur {
+- id: int
+- nom: String
+- email: String
++ seConnecter()
++ seDeconnecter()
+}
+class Visiteur {
++ consulterProduits()
++ ajouterAuPanier()
+}
+class Client {
+- telephone: String
++ passerCommande()
++ modifierCompte()
+}
+class Administrateur {
++ gererStock()
++ gererProduits()
++ archiverUtilisateur()
+}
+class Produit {
+- id: int
+- nom: String
+- prix: double
+- quantiteStock: int
++ afficherDetails()
++ verifierDisponibilite()
+}
+class Categorie {
+- id: int
+- nomCategorie: String
++ ajouterProduit()
++ listerProduits()
+}
+class Stock {
+- dateEntree: Date
++ mettreAJourQuantite()
++ alerterStockFaible()
+}
+' Relations
+Utilisateur <|-- Visiteur
+Visiteur <|-- Client
+Utilisateur <|-- Administrateur
+Produit "*" -- "1" Categorie : appartient à
+Produit "1" -- "1" Stock : gère
+@enduml
