@@ -1,0 +1,224 @@
+@startuml DC_TunisFood
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor LightYellow
+  BorderColor DarkOrange
+  HeaderBackgroundColor Orange 
+}
+
+title Diagramme de Classes — TunisFood\nResponsable : Wissal
+
+' =====================
+' CLASSES COMMUNES
+' =====================
+class Utilisateur {
+  - id : int
+  - nom : String
+  - prenom : String
+  - email : String
+  - motDePasse : String
+  - telephone : String
+  - dateInscription : Date
+  + seConnecter(email: String, mdp: String) : boolean
+  + seDeconnecter() : void
+  + mettreAJourProfil() : void
+  + afficherDetails() : String
+  + getNom() : String
+  + getEmail() : String
+}
+
+class Client {
+  - adresseLivraison : String
+  - ville : String
+  - codePostal : String
+  - solde : double
+  + passerCommande(panier: Panier) : Commande
+  + consulterHistorique() : List<Commande>
+  + ajouterAvis(commande: Commande, note: int, commentaire: String) : Avis
+  + getAdresseLivraison() : String
+  + getSolde() : double
+}
+
+class Livreur {
+  - vehicule : String
+  - numeroPermis : String
+  - statut : String
+  - notemoyenne : double
+  + accepterLivraison(livraison: Livraison) : void
+  + mettreAJourStatut(statut: String) : void
+  + voirItineraire(livraison: Livraison) : String
+  + getNotemoyenne() : double
+}
+
+class Administrateur {
+  - niveauAcces : int
+  + ajouterPlat(plat: Plat) : void
+  + modifierPlat(plat: Plat) : void
+  + supprimerPlat(id: int) : void
+  + voirStatistiques() : Statistiques
+  + gererUtilisateurs() : List<Utilisateur>
+  + gererLivraisons() : List<Livraison>
+}
+
+' =====================
+' FONCTIONNALITÉ 1 — MENU & PLATS
+' =====================
+class Plat {
+  - id : int
+  - nom : String
+  - description : String
+  - prix : double
+  - photosUrl : List<String>
+  - categorie : String
+  - disponible : boolean
+  - tempsPreparation : int
+  - ingredients : List<String>
+  + afficherDetails() : String
+  + estDisponible() : boolean
+  + ajouterPhoto(url: String) : void
+  + getNom() : String
+  + getPrix() : double
+  + getPhotosUrl() : List<String>
+}
+
+class Categorie {
+  - id : int
+  - nom : String
+  - description : String
+  - icone : String
+  + getPlats() : List<Plat>
+  + getNom() : String
+}
+
+' =====================
+' FONCTIONNALITÉ 2 — PANIER & COMMANDE
+' =====================
+class Panier {
+  - id : int
+  - lignes : List<LigneCommande>
+  - dateCreation : Date
+  + ajouterPlat(plat: Plat, quantite: int) : void
+  + retirerPlat(plat: Plat) : void
+  + calculerTotal() : double
+  + vider() : void
+  + afficherContenu() : String
+  + getNombrePlats() : int
+}
+
+class LigneCommande {
+  - plat : Plat
+  - quantite : int
+  - prixUnitaire : double
+  + getSousTotal() : double
+  + getPlat() : Plat
+  + getQuantite() : int
+}
+
+class Commande {
+  - id : int
+  - reference : String
+  - dateCommande : Date
+  - statut : String
+  - modePaiement : String
+  - adresseLivraison : String
+  - total : double
+  - notes : String
+  + confirmerCommande() : void
+  + annulerCommande() : boolean
+  + calculerTotal() : double
+  + getStatut() : String
+  + getReference() : String
+  + afficherDetails() : String
+}
+
+' =====================
+' FONCTIONNALITÉ 3 — LIVRAISON
+' =====================
+class Livraison {
+  - id : int
+  - dateDepart : Date
+  - dateArriveeEstimee : Date
+  - statut : String
+  - adresseDepart : String
+  - adresseArrivee : String
+  - distanceKm : double
+  - fraisLivraison : double
+  + suivreLivraison() : String
+  + mettreAJourStatut(statut: String) : void
+  + calculerFrais() : double
+  + getStatut() : String
+  + getDateArriveeEstimee() : Date
+}
+
+' =====================
+' FONCTIONNALITÉ 4 — PAIEMENT
+' =====================
+class Paiement {
+  - id : int
+  - montant : double
+  - datePaiement : Date
+  - methode : String
+  - statut : String
+  - reference : String
+  + effectuerPaiement() : boolean
+  + rembourser() : boolean
+  + validerPaiement() : boolean
+  + getMontant() : double
+  + getStatut() : String
+  + getReference() : String
+}
+
+' =====================
+' FONCTIONNALITÉ 5 — AVIS
+' =====================
+class Avis {
+  - id : int
+  - note : int
+  - commentaire : String
+  - dateAvis : Date
+  - reponseAdmin : String
+  + validerAvis() : boolean
+  + afficherAvis() : String
+  + getNote() : int
+  + getCommentaire() : String
+}
+
+' =====================
+' CLASSE STATISTIQUES
+' =====================
+class Statistiques {
+  - revenus : double
+  - nombreCommandes : int
+  - nombreClients : int
+  - platLePlusCommande : String
+  + genererRapport() : String
+  + getRevenus() : double
+}
+
+' =====================
+' RELATIONS
+' =====================
+Client --|> Utilisateur : hérite
+Livreur --|> Utilisateur : hérite
+Administrateur --|> Utilisateur : hérite
+
+Categorie "1" o-- "0..*" Plat : contient
+
+Client "1" -- "0..*" Commande : passe
+Commande "1" *-- "1..*" LigneCommande : comprend
+LigneCommande "1" --> "1" Plat : référence
+
+Client "1" *-- "1" Panier : possède
+Panier "1" o-- "0..*" LigneCommande : gère
+
+Commande "1" -- "1" Livraison : génère
+Commande "1" -- "1" Paiement : associe
+Livraison "1" --> "1" Livreur : assignée à
+
+Client "1" -- "0..*" Avis : rédige
+Avis "1" --> "1" Commande : concerne
+
+Administrateur "1" -- "0..*" Statistiques : consulte
+Administrateur "1" -- "0..*" Plat : gère
+
+@enduml

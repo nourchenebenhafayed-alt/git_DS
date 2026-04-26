@@ -1,0 +1,93 @@
+@startuml DCU_TunisFood
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor LightYellow
+  BorderColor DarkOrange
+}
+skinparam actor {
+  BorderColor DarkOrange
+}
+
+title Diagramme de Cas d'Utilisation — TunisFood
+
+actor "Visiteur" as V
+actor "Client" as C
+actor "Livreur" as L
+actor "Administrateur" as A
+
+C --|> V
+
+rectangle "Système TunisFood" {
+
+  ' Fonctionnalités Visiteur
+  usecase "Consulter le menu" as UC1
+  usecase "Voir les photos des plats" as UC2
+  usecase "Rechercher un plat" as UC3
+  usecase "S'inscrire" as UC4
+  usecase "Se connecter" as UC5
+
+  ' Fonctionnalités Client
+  usecase "Passer une commande" as UC6
+  usecase "Ajouter au panier" as UC7
+  usecase "Choisir mode de livraison" as UC8
+  usecase "Effectuer le paiement" as UC9
+  usecase "Suivre la commande" as UC10
+  usecase "Consulter l'historique" as UC11
+  usecase "Annuler une commande" as UC12
+  usecase "Laisser un avis" as UC13
+  usecase "Gérer son profil" as UC14
+
+  ' Fonctionnalités Livreur
+  usecase "Accepter une livraison" as UC15
+  usecase "Mettre à jour le statut" as UC16
+  usecase "Voir l'itinéraire" as UC17
+
+  ' Fonctionnalités Admin
+  usecase "Gérer le menu" as UC18
+  usecase "Ajouter/Modifier un plat" as UC19
+  usecase "Gérer les commandes" as UC20
+  usecase "Gérer les utilisateurs" as UC21
+  usecase "Voir les statistiques" as UC22
+  usecase "Gérer les livraisons" as UC23
+
+  ' Relations include/extend
+  UC6 ..> UC7 : <<include>>
+  UC6 ..> UC8 : <<include>>
+  UC6 ..> UC9 : <<include>>
+  UC10 ..> UC16 : <<include>>
+  UC18 ..> UC19 : <<include>>
+  UC12 ..> UC9 : <<extend>>
+  UC3 ..> UC1 : <<extend>>
+  UC13 ..> UC11 : <<extend>>
+  UC17 ..> UC15 : <<extend>>
+}
+
+' Associations Visiteur
+V --> UC1
+V --> UC2
+V --> UC3
+V --> UC4
+V --> UC5
+
+' Associations Client
+C --> UC6
+C --> UC10
+C --> UC11
+C --> UC12
+C --> UC13
+C --> UC14
+
+' Associations Livreur
+L --> UC15
+L --> UC16
+L --> UC17
+
+' Associations Admin
+A --> UC18
+A --> UC20
+A --> UC21
+A --> UC22
+A --> UC23
+
+@enduml

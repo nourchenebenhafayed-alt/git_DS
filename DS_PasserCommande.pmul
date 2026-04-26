@@ -1,0 +1,86 @@
+@startuml DS_PasserCommande
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 10
+skinparam sequenceParticipant underline
+
+title Diagramme de Séquence — Scénario Principal : Passer une Commande\nTunisFood — Wissal
+
+actor "Client" as C
+participant "Interface\nConsole" as UI
+participant "Panier" as P
+participant "Commande" as CMD
+participant "Paiement" as PAY
+participant "Livraison" as LIV
+participant "Système" as SYS
+
+C -> UI : seConnecter(email, motDePasse)
+activate UI
+
+UI -> SYS : validerIdentifiants(email, motDePasse)
+activate SYS
+alt Identifiants valides
+  SYS --> UI : connexionReussie = true
+else Identifiants invalides
+  SYS --> UI : erreur("Identifiants incorrects")
+  UI --> C : afficherErreur()
+end
+deactivate SYS
+
+UI --> C : afficherMenuPrincipal()
+
+C -> UI : consulterMenu()
+UI -> SYS : chargerPlats()
+activate SYS
+SYS --> UI : listePlats[]
+deactivate SYS
+UI --> C : afficherPlatsAvecPhotos()
+
+loop Tant que le client ajoute des plats
+  C -> UI : ajouterAuPanier(plat, quantite)
+  UI -> P : ajouterPlat(plat, quantite)
+  activate P
+  P -> P : calculerTotal()
+  P --> UI : totalMisAJour
+  deactivate P
+  UI --> C : afficherPanier()
+end
+
+C -> UI : validerPanier()
+UI -> P : afficherContenu()
+activate P
+P --> UI : contenuPanier, total
+deactivate P
+UI --> C : afficherRecapitulatif(total)
+
+C -> UI : confirmerAdresseLivraison(adresse)
+C -> UI : choisirModePaiement("Carte / Espèces")
+
+UI -> CMD : creerCommande(panier, adresse, modePaiement)
+activate CMD
+CMD -> CMD : genererReference()
+CMD -> CMD : calculerTotal()
+CMD --> UI : commande(reference)
+deactivate CMD
+
+UI -> PAY : effectuerPaiement(montant, methode)
+activate PAY
+alt Paiement accepté
+  PAY -> PAY : validerPaiement()
+  PAY --> UI : paiementOK(reference)
+else Paiement refusé
+  PAY --> UI : paiementEchoue()
+  UI --> C : afficherErreurPaiement()
+end
+deactivate PAY
+
+UI -> LIV : creerLivraison(commande, adresse)
+activate LIV
+LIV -> LIV : calculerFrais()
+LIV -> LIV : estimerDelai()
+LIV --> UI : livraison(dateEstimee, frais)
+deactivate LIV
+
+CMD -> CMD : confirmerCommande()
+UI --> C : afficherConfirmation(reference, dateEstimee)
+
+@enduml

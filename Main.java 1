@@ -1,0 +1,212 @@
+package com.tunisfood.models;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * =====================================================
+ *   TunisFood — Prototype Java V1 — Sprint 1
+ *   Auteure : Wissal
+ *   Projet : Site de réservation de plats tunisiens
+ * =====================================================
+ */
+public class Main {
+
+    public static void main(String[] args) {
+
+        separateur("=", 55);
+        System.out.println("   🍽️  TunisFood — Démonstration Sprint 1");
+        System.out.println("   Site de réservation de plats tunisiens");
+        System.out.println("   Auteure : Wissal");
+        separateur("=", 55);
+
+        // ==========================================
+        // FONCTIONNALITÉ 1 — INSCRIPTION & CONNEXION
+        // ==========================================
+        titre("1 — Authentification & Gestion du Compte");
+
+        Client client1 = new Client(
+            1, "Ben Ali", "Fatma", "fatma@email.tn",
+            "motdepasse123", "+216 20 111 222",
+            "12 Rue de Carthage", "Tunis", "1000", 150.0
+        );
+
+        Client client2 = new Client(
+            2, "Trabelsi", "Mohamed", "med@email.tn",
+            "pass456", "+216 25 333 444",
+            "5 Avenue Habib Bourguiba", "Sfax", "3000", 80.0
+        );
+
+        Livreur livreur1 = new Livreur(
+            10, "Haddad", "Karim", "karim.livreur@email.tn",
+            "livreur789", "+216 98 555 666",
+            "Scooter Yamaha 2022", "TN-2024-001"
+        );
+
+        System.out.println("👤 " + client1.afficherDetails());
+        System.out.println("👤 " + client2.afficherDetails());
+        System.out.println("🚴 " + livreur1.afficherDetails());
+
+        System.out.println();
+        boolean connexion = client1.seConnecter("fatma@email.tn", "motdepasse123");
+        System.out.println("🔑 Connexion Fatma : " + (connexion ? "✅ Réussie" : "❌ Échouée"));
+
+        boolean connexionEchec = client1.seConnecter("fatma@email.tn", "mauvais");
+        System.out.println("🔑 Connexion avec mauvais mdp : " + (connexionEchec ? "✅ Réussie" : "❌ Échouée"));
+
+        // ==========================================
+        // FONCTIONNALITÉ 2 — MENU & PHOTOS DES PLATS
+        // ==========================================
+        titre("2 — Menu Tunisien avec Photos");
+
+        List<Plat> menu = new ArrayList<>();
+
+        Plat couscous = new Plat(1, "Couscous Tunisien", "Couscous au poulet et légumes de saison", 18.500, "Plat Principal", 30);
+        couscous.ajouterPhoto("https://tunisfood.tn/photos/couscous.jpg");
+        couscous.ajouterIngredient("Couscous");
+        couscous.ajouterIngredient("Poulet fermier");
+        couscous.ajouterIngredient("Légumes tunisiens");
+        couscous.ajouterIngredient("Harissa");
+
+        Plat brik = new Plat(2, "Brik à l'oeuf", "Brik croustillant fourré à l'oeuf et thon", 4.500, "Entrée", 10);
+        brik.ajouterPhoto("https://tunisfood.tn/photos/brik.jpg");
+
+        Plat lablabi = new Plat(3, "Lablabi", "Soupe de pois chiches épicée, spécialité de Tunis", 6.000, "Soupe", 15);
+        lablabi.ajouterPhoto("https://tunisfood.tn/photos/lablabi.jpg");
+
+        Plat tajine = new Plat(4, "Tajine Tunisien", "Tajine à base d'oeufs, viande et légumes", 12.000, "Plat Principal", 25);
+        tajine.ajouterPhoto("https://tunisfood.tn/photos/tajine.jpg");
+
+        Plat makrouna = new Plat(5, "Makrouna Cha3riya", "Pâtes tunisiennes sauce tomate épicée", 9.500, "Plat Principal", 20);
+        makrouna.ajouterPhoto("https://tunisfood.tn/photos/makrouna.jpg");
+
+        menu.add(couscous);
+        menu.add(brik);
+        menu.add(lablabi);
+        menu.add(tajine);
+        menu.add(makrouna);
+
+        System.out.println("📋 Menu disponible (" + menu.size() + " plats) :");
+        for (Plat p : menu) {
+            System.out.println("   " + p.afficherDetails());
+            if (!p.getPhotosUrl().isEmpty()) {
+                System.out.println("      📷 Photo : " + p.getPhotosUrl().get(0));
+            }
+        }
+
+        // ==========================================
+        // FONCTIONNALITÉ 3 — PANIER & COMMANDE
+        // ==========================================
+        titre("3 — Panier & Passage de Commande");
+
+        Panier panier = new Panier(1);
+        panier.ajouterPlat(couscous, 2);
+        panier.ajouterPlat(brik, 3);
+        panier.ajouterPlat(lablabi, 1);
+
+        System.out.println();
+        System.out.print(panier.afficherContenu());
+
+        Commande commande1 = client1.passerCommande(panier);
+        if (commande1 != null) {
+            commande1.setModePaiement("Carte bancaire");
+            commande1.confirmerCommande();
+        }
+
+        // ==========================================
+        // FONCTIONNALITÉ 4 — PAIEMENT
+        // ==========================================
+        titre("4 — Paiement");
+
+        Paiement paiement1 = new Paiement(1, panier.calculerTotal(), "Carte bancaire");
+        boolean paiementOk = paiement1.effectuerPaiement();
+        System.out.println("💰 Statut paiement : " + paiement1.getStatut() +
+                           " | Réf : " + paiement1.getReference());
+
+        Paiement paiement2 = new Paiement(2, 9.500, "Espèces");
+        paiement2.effectuerPaiement();
+
+        // ==========================================
+        // FONCTIONNALITÉ 5 — LIVRAISON
+        // ==========================================
+        titre("5 — Livraison");
+
+        Livraison livraison1 = new Livraison(
+            1,
+            "Cuisine TunisFood, Lac 1, Tunis",
+            "12 Rue de Carthage, Tunis",
+            3.5
+        );
+
+        System.out.println("📦 Frais de livraison calculés : " +
+                           String.format("%.2f", livraison1.getFraisLivraison()) + " DT");
+
+        livreur1.accepterLivraison(livraison1);
+        livreur1.voirItineraire(livraison1);
+        livraison1.suivreLivraison();
+        livraison1.mettreAJourStatut("Livré");
+
+        // ==========================================
+        // FONCTIONNALITÉ 6 — AVIS
+        // ==========================================
+        titre("6 — Avis des Clients");
+
+        Avis avis1 = client1.ajouterAvis(commande1, 5, "Excellent couscous, livraison rapide !");
+        Avis avis2 = client2.ajouterAvis(null, 4, "Très bon brik, légèrement huileux");
+        Avis avis3 = new Avis(3, "Lablabi correct mais manque de harissa", "Sami Jaziri");
+
+        System.out.println("\n⭐ Avis des clients :");
+        System.out.println("   → " + (avis1 != null ? avis1.afficherAvis() : ""));
+        System.out.println("   → " + (avis2 != null ? avis2.afficherAvis() : ""));
+        System.out.println("   → " + avis3.afficherAvis());
+
+        // ==========================================
+        // FONCTIONNALITÉ 7 — TABLEAU DE BORD ADMIN
+        // ==========================================
+        titre("7 — Tableau de Bord Administrateur");
+
+        Administrateur admin = new Administrateur(
+            100, "Karray", "Fatma", "admin@tunisfood.tn",
+            "admin2026", "+216 71 000 000", 3
+        );
+
+        List<Commande> toutesCommandes = new ArrayList<>();
+        if (commande1 != null) toutesCommandes.add(commande1);
+
+        Commande commande2 = new Commande(2, "CMD-0002", "5 Av. Bourguiba, Sfax", "Confirmée", 9.500);
+        toutesCommandes.add(commande2);
+
+        List<Utilisateur> tousUtilisateurs = new ArrayList<>();
+        tousUtilisateurs.add(client1);
+        tousUtilisateurs.add(client2);
+        tousUtilisateurs.add(livreur1);
+
+        admin.voirStatistiques(toutesCommandes, tousUtilisateurs);
+
+        // Ajout d'un nouveau plat par l'admin
+        Plat nouveauPlat = new Plat(6, "Assida Zgougou", "Dessert tunisien traditionnel", 7.000, "Dessert", 5);
+        admin.ajouterPlat(nouveauPlat, menu);
+        System.out.println("   Menu total : " + menu.size() + " plats");
+
+        // ==========================================
+        // RÉSUMÉ FINAL
+        // ==========================================
+        separateur("=", 55);
+        System.out.println("   ✅ SPRINT 1 TERMINÉ — Prototype V1 fonctionnel");
+        System.out.println("   📊 Récapitulatif :");
+        System.out.println("      - Utilisateurs créés : 3 (2 clients, 1 livreur, 1 admin)");
+        System.out.println("      - Plats au menu : " + menu.size());
+        System.out.println("      - Commandes passées : " + toutesCommandes.size());
+        System.out.println("      - Paiements validés : 2");
+        System.out.println("      - Livraisons : 1");
+        System.out.println("      - Avis clients : 3");
+        separateur("=", 55);
+    }
+
+    private static void titre(String titre) {
+        System.out.println("\n--- " + titre + " ---");
+    }
+
+    private static void separateur(String car, int longueur) {
+        System.out.println(car.repeat(longueur));
+    }
